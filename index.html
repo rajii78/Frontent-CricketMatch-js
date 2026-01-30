@@ -79,7 +79,7 @@
     </h4>
 
     <div class="bg-white rounded p-3 shadow mb-3" style="width:700px; height:305px; margin:auto; border:1px solid #efe1e1;">
-        <span>T20</span>
+        <span>T20 (5 Overs)</span>
         <span id="today" class="float-end text-secondary" style="font-size: 12px;">Today</span>
         <p id="team-name" class="text-center fw-semibold text-primary">India Batting</p>
         <h3 id="points" class="d-flex justify-content-center mt-5" style="font-size:30px;">Let's Play!</h3>
@@ -289,6 +289,7 @@ function reset(){
     scores.forEach(s=>Object.assign(s,{runs:0,balls:0,fours:0,sixes:0}));
     scores1.forEach(s=>Object.assign(s,{runs:0,balls:0,fours:0,sixes:0}));
     initTable(scores, players);
+     document.getElementById("target").innerText="";
     document.getElementById('totals').innerText=" Total Score is : 0/0";
     document.getElementById('overs').innerText=" (0.0)";
     document.getElementById('points').innerText="Ready to Play!";
