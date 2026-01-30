@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cricket Game</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin-left: 20px;
+        display: flex;
+        justify-content:space-around;
+        align-items: center;
+        min-height: 100vh;
+        background: url(/cricket1-img.jpg) no-repeat center center/cover;
+    }
+    #bat, #reset, #NextInnings {
+        border: 1px solid;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        padding: 10px 25px;
+        font-size: 18px;
+        background-color: orange;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+    }
+    #condiner {
+        width: 800px;
+        height: 600px;
+        margin-bottom: 20px;
+        border: 1px solid;
+        padding: 20px;
+        background-color: #09d8ca;
+        border-radius: 10px; 
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+    } 
+    #sub-condiner {
+        display: flex;
+        justify-content:center ;
+        margin-top: 25px;
+    }
+    #bat:hover, #reset:hover {
+        background-color: rgb(14, 189, 40);
+    }
+    #NextInnings:hover {
+        background-color: green;
+    }
+    #score-table {   
+        border-collapse: collapse;
+        border-radius: 15px;
+        margin-left: 10px;
+        background: #AABBCC;  
+        padding: 5px;
+    }
+    th, td {
+        background-color:#AABBCC;
+        padding: 12px 18px;
+        border:1px;
+        border-radius: 10px 10px 0 0;
+        text-align: center;
+    }
+    th {  
+        background:  #004aad;
+        color: white;
+    }
+</style>
+</head>
+<body>
+
+<div id="condiner" class="container rounded shadow">
+    <h4 class="text-center mb-3" style="font-size: 20px; color: red; font-weight: 800;">
+        India <span style="color: black;font-size: 13px;">vs</span> Ast
+    </h4>
+
+    <div class="bg-white rounded p-3 shadow mb-3" style="width:700px; height:305px; margin:auto; border:1px solid #efe1e1;">
+        <span>T20</span>
+        <span id="today" class="float-end text-secondary" style="font-size: 12px;">Today</span>
+        <p id="team-name" class="text-center fw-semibold text-primary">India Batting</p>
+        <h3 id="points" class="d-flex justify-content-center mt-5" style="font-size:30px;">Let's Play!</h3>
+
+        <div class="d-flex justify-content-between align-items-center mt-5">
+            <div>
+                <p id="player" class="fw-bold" style="font-size: 15px;">Player : (Shubman Gill)</p>
+            </div>
+            <p id="four" style="font-size: 15px;">-</p>
+        </div>
+
+        <div id="point-target-container" class="d-flex justify-content-between">
+            <div id="point-display-condiner" class="d-flex gap-3">
+                <p id="point-display1">-</p>
+                <p id="point-display2">-</p>
+                <p id="point-display3">-</p>
+                <p id="point-display4">-</p>
+                <p id="point-display5">-</p>
+                <p id="point-display6">-</p>
+            </div>
+            <div>
+                <p id="target" class="text-center fw-semibold" style="font-size:20px;">-</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="sub-condiner" class="d-flex justify-content-center mb-3">
+        <div class="d-flex gap-3">
+            <h2 id="totals" class="mb-0 mt-3">Score :</h2>
+            <p id="overs" class="mt-3"></p>
+        </div>
+    </div>
+
+    <p id="status" class="text-center mb-3" style="font-size:20px;">-</p>
+
+    <div class="d-flex justify-content-around mb-3">
+        <button id="bat" onclick="num()">Bat 🏏</button>
+        <button id="NextInnings" onclick="NextInnings()">Next Innings</button>
+        <button id="reset" onclick="reset()">Reset</button>
+    </div>
+</div>
+
+<!-- Score Table -->
+<div id="score-table" class="container mt-4 rounded shadow p-3 bg-light">
+    <h2 class="text-center text-warning mb-3" style="color:rgb(226, 68, 10);">Players Score Table</h2>
+    <table class="table table-bordered text-center align-middle">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>T. Runs</th>
+                <th>Balls</th>
+                <th>4s</th>
+                <th>6s</th>
+            </tr>
+        </thead>
+        <tbody id="score-body"></tbody>
+    </table>
+</div>
+
+<!-- JavaScript -->
+<script>
+let team1=0, team2=0, innings=1, wicket=0, curplayer=0, balls=0, overs=0, currentball=1;
+
+const players=["Shubman Gill","Virat Kohli","Suryakumar Yadav","KL Rahul","Sanju Samson","Rishabh Pant","MS Dhoni","Harthik Pandiya","R.Ashwin","Jasprit Bumrah"];
+const players1 = ["David Warner", "Steve Smith", "Glenn Maxwell","Mitchell Marsh", "Marcus Stoinis", "Matthew Wade","Pat Cummins", "Mitchell Starc", "Adam Zampa", "Josh Hazlewood"];
+const scores = players.map(()=>({runs:0, balls:0, fours:0, sixes:0}));
+const scores1 = players1.map(()=>({runs:0, balls:0, fours:0, sixes:0}));
+
+document.getElementById('NextInnings').style.display = "none";
+const body = document.getElementById("score-body");
+
+// Initialize table
+function initTable(list, playersList) {
+    body.innerHTML="";
+    playersList.forEach((player,i)=>{
+        const row = body.insertRow();
+        row.insertCell().innerText = player;
+        row.insertCell().innerText = list[i].runs;
+        row.insertCell().innerText = list[i].balls;
+        row.insertCell().innerText = list[i].fours;
+        row.insertCell().innerText = list[i].sixes;
+    });
+}
+initTable(scores, players);
+
+// Update table dynamically
+function updateTable(list){
+    [...body.rows].forEach((row,i)=>{
+        const s = list[i];
+        row.cells[1].innerText = s.runs;
+        row.cells[2].innerText = s.balls;
+        row.cells[3].innerText = s.fours;
+        row.cells[4].innerText = s.sixes;
+    });
+}
+
+// First innings play
+function num(){
+    if(innings===1){ playfirstinnings(); }
+    else { playsecondinnings(); }
+}
+
+function playfirstinnings(){
+    if(overs===5||curplayer>=players.length){
+        document.getElementById('status').style.color="blue";
+        document.getElementById("bat").disabled = true;
+        document.getElementById('totals').innerText="End of 1st Innings India Final Score: "+team1+"/"+wicket;
+        document.getElementById('NextInnings').style.display="block";
+        return;
+    }
+
+    let number=Math.floor(Math.random()*7);
+    if(number===0){
+        wicket++;
+        document.getElementById('points').innerText = players[curplayer]+" is out!";
+        curplayer++;
+        if(curplayer<players.length) document.getElementById('player').innerText = "Next Player : ( " + players[curplayer]+" )";
+        else { document.getElementById("points").innerText = "All players are out!"; document.getElementById("bat").disabled=true; }
+    } else {
+        team1+=number;
+        const s = scores[curplayer];
+        s.runs+=number; s.balls++;
+        if(number===4) s.fours++;
+        if(number===6) s.sixes++;
+        updateTable(scores);
+        document.getElementById('points').innerText="You hit "+number+" runs!";
+        document.getElementById("today").innerText="• Live"; document.getElementById("today").style.color="green";
+        if(number===4){document.getElementById('four').innerText="Boundary!"; document.getElementById('four').style.color="blue";}
+        else if(number===6){document.getElementById('four').innerText="Sixer!"; document.getElementById('four').style.color="green";}
+        else{document.getElementById('four').innerText="";}
+    }
+
+    balls++;
+    if(balls===6){ overs++; balls=0; }
+    document.getElementById('totals').innerText=" Total Score is : "+team1+"/"+wicket;
+    document.getElementById('overs').innerText =" ("+overs+"."+balls+")";
+
+    if(currentball<=6){
+        const display = document.getElementById(`point-display${currentball}`);
+        display.innerText=number;
+        display.style.color=number===4?"blue":number===6?"green":number===0?"red":"black";
+        currentball++;
+    } else {
+        for(i=1;i<=6;i++) document.getElementById(`point-display${i}`).innerText="";
+        currentball=1;
+        const display = document.getElementById(`point-display${currentball}`);
+        display.innerText=number;
+        display.style.color=number===4?"blue":number===6?"green":number===0?"red":"black";
+        currentball++;
+    }
+}
+
+// Second innings
+function NextInnings(){
+    innings=2; curplayer=0; wicket=0; balls=0; overs=0;
+    document.getElementById("target").innerText="Target - "+team1;
+    document.getElementById("bat").disabled=false;
+    document.getElementById('four').innerText="";
+    document.getElementById('totals').innerText=" Total Score is : 0/0";
+    document.getElementById('overs').innerText=" (0.0)";
+    document.getElementById('points').innerText="Next Innings!";
+    document.getElementById('team-name').innerText="Ast Batting";
+    document.getElementById('player').innerText="Player : ( " + players1[curplayer]+" )";
+    initTable(scores1, players1);
+    for(i=1;i<=6;i++) document.getElementById(`point-display${i}`).innerText="";
+}
+
+function playsecondinnings(){
+    if(overs===5||curplayer>=players1.length){ endofmatch(); document.getElementById("bat").disabled=true; document.getElementById('totals').innerText="End of 2nd Innings Ast Final Score: "+team2+"/"+wicket; return; }
+    let number=Math.floor(Math.random()*7);
+    if(number===0){ wicket++; document.getElementById('points').innerText=players1[curplayer]+" is out!"; curplayer++;
+        if(curplayer<players1.length) document.getElementById('player').innerText="Next Player : ( "+players1[curplayer]+" )"; 
+        else { document.getElementById("points").innerText="All players are out!"; endofmatch(); return; }
+    } else {
+        team2+=number; const s = scores1[curplayer]; s.runs+=number; s.balls++;
+        if(number===4){ s.fours++; document.getElementById('four').innerText="Boundary!"; document.getElementById('four').style.color="blue";}
+        else if(number===6){ s.sixes++; document.getElementById('four').innerText="Sixer!"; document.getElementById('four').style.color="green";}
+        else document.getElementById('four').innerText="";
+        updateTable(scores1);
+        document.getElementById('points').innerText="You hit "+number+" runs!";
+        document.getElementById("today").innerText="• Live"; document.getElementById("today").style.color="green";
+    }
+    balls++; if(balls===6){ overs++; balls=0; }
+    document.getElementById('overs').innerText =" ("+overs+"."+balls+")";
+    document.getElementById('totals').innerText=" Total Score is : "+team2+"/"+wicket;
+    if(currentball<=6){ document.getElementById(`point-display${currentball}`).innerText=number; currentball++; }
+    else{ for(i=1;i<=6;i++) document.getElementById(`point-display${i}`).innerText=""; currentball=1; document.getElementById(`point-display${currentball}`).innerText=number; currentball++; }
+}
+
+// End match
+function endofmatch(){
+    document.getElementById('four').innerText="";
+    document.getElementById('team-name').innerText="";
+    document.getElementById('status').innerHTML="Match Over!";
+     document.getElementById('status').style.color="blue";
+    document.getElementById('player').innerText="";
+    if(team1>team2) document.getElementById('points').innerText=" Result : Team India Win!";
+    else if(team1===team2) document.getElementById('points').innerText=" Result : Match Draw!";
+    else document.getElementById('points').innerText=" Result : Team Ast Win!";
+    document.getElementById("bat").disabled=true;
+    for(i=1;i<=6;i++) document.getElementById(`point-display${i}`).innerText="";
+}
+
+// Reset game
+function reset(){
+    innings=1; team1=0; team2=0; curplayer=0; wicket=0; balls=0; overs=0;
+    scores.forEach(s=>Object.assign(s,{runs:0,balls:0,fours:0,sixes:0}));
+    scores1.forEach(s=>Object.assign(s,{runs:0,balls:0,fours:0,sixes:0}));
+    initTable(scores, players);
+    document.getElementById('totals').innerText=" Total Score is : 0/0";
+    document.getElementById('overs').innerText=" (0.0)";
+    document.getElementById('points').innerText="Ready to Play!";
+    document.getElementById('team-name').innerText="India Batting";
+    document.getElementById('status').innerHTML="";
+    document.getElementById('player').innerText="Player : ( "+players[curplayer]+" )";
+    document.getElementById('four').innerText=""; document.getElementById('today').innerText="Today"; document.getElementById('today').style.color="#888";
+    document.getElementById("bat").disabled=false;
+    for(i=1;i<=6;i++) document.getElementById(`point-display${i}`).innerText="";
+}
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
